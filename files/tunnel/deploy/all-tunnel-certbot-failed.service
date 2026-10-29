@@ -1,0 +1,14 @@
+# Runs when all-tunnel-certbot.service fails (OnFailure=). It makes the failure impossible to miss on the node itself:
+#   a CRITICAL line in the journal (`journalctl -p crit -t all-tunnel-certbot`), a marker file that `the deploy tool status` reports, and a wall
+#   message to whoever is logged in. The service itself stays in the failed state (`systemctl --failed`) until the next run succeeds, which clears the
+#   marker (all-tunnel-cert-check does).
+# The mail to the owner does not come from here (a node has no mail and no secret to send one with): it comes from the site monitor (14 and 5 days left,
+# the site's monitor) and from the independent CT watcher, which both read the certificate the node SERVES.
+[Unit]
+Description=The ALL tunnel node's certificate renewal FAILED
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/logger -p daemon.crit -t all-tunnel-certbot "node certificate renewal FAILED: read journalctl -u all-tunnel-certbot, fix it, then systemctl start all-tunnel-certbot"
+ExecStart=/bin/sh -c 'date -u +%%FT%%TZ > /var/lib/all-tunnel/certbot.failed'
+ExecStart=-/usr/bin/wall "all-tunnel: the node certificate renewal FAILED (journalctl -u all-tunnel-certbot)"

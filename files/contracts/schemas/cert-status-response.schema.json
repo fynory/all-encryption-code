@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/cert-status-response.schema.json",
+  "title": "GET /v1/devices/acme/status: what the broker holds for the caller's label (no secrets, never a TXT value).",
+  "type": "object",
+  "required": ["ok", "v", "label", "host", "class", "reservation", "issuances", "enroll_after", "server_time"],
+  "additionalProperties": false,
+  "properties": {
+    "ok": {"const": true},
+    "v": {"const": 1},
+    "label": {"$ref": "common.schema.json#/$defs/label"},
+    "host": {"$ref": "common.schema.json#/$defs/fqdn"},
+    "class": {"$ref": "common.schema.json#/$defs/budget_class"},
+    "reservation": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "required": ["reservation_id", "spki_sha256", "expires_at"],
+          "additionalProperties": false,
+          "properties": {
+            "reservation_id": {"$ref": "common.schema.json#/$defs/reservation_id"},
+            "spki_sha256": {"$ref": "common.schema.json#/$defs/sha256_b64url"},
+            "expires_at": {"$ref": "common.schema.json#/$defs/epoch_s"}
+          }
+        }
+      ]
+    },
+    "issuances": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "required": ["spki_sha256", "not_before", "not_after"],
+        "additionalProperties": false,
+        "properties": {
+          "spki_sha256": {"$ref": "common.schema.json#/$defs/sha256_b64url"},
+          "not_before": {"$ref": "common.schema.json#/$defs/epoch_s"},
+          "not_after": {"$ref": "common.schema.json#/$defs/epoch_s"}
+        }
+      }
+    },
+    "enroll_after": {"oneOf": [{"type": "null"}, {"$ref": "common.schema.json#/$defs/epoch_s"}]},
+    "server_time": {"$ref": "common.schema.json#/$defs/epoch_s"}
+  }
+}

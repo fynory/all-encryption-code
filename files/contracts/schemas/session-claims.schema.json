@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/session-claims.schema.json",
+  "title": "Claims of a device session (typ device-session) as the control plane device-security module issues them (ver 2, 300 s). The tunnel node accepts only aud all-tunnel; the lifetime check exp - iat == policy.authorization.session_ttl_s is done in code. Unknown extra claims are ignored (a token is not a closed shape), the listed ones are not optional unless the schema says so.",
+  "type": "object",
+  "required": ["typ", "ver", "iss", "aud", "sub", "iat", "exp", "jti", "generation", "cnf"],
+  "properties": {
+    "typ": {"const": "device-session"},
+    "ver": {"const": 2},
+    "iss": {"const": "https://api.all-mcp.fyi"},
+    "aud": {"type": "string", "enum": ["all-control", "all-relay", "all-tunnel"]},
+    "sub": {"$ref": "common.schema.json#/$defs/device_id"},
+    "iat": {"$ref": "common.schema.json#/$defs/epoch_s"},
+    "exp": {"$ref": "common.schema.json#/$defs/epoch_s"},
+    "jti": {"$ref": "common.schema.json#/$defs/jti"},
+    "generation": {"type": "integer", "minimum": 1, "maximum": 9007199254740991},
+    "cnf": {
+      "type": "object",
+      "required": ["jwk"],
+      "additionalProperties": false,
+      "properties": {"jwk": {"$ref": "common.schema.json#/$defs/public_jwk"}}
+    }
+  }
+}

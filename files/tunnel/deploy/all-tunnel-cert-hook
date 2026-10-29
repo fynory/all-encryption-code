@@ -1,0 +1,64 @@
+#!/bin/sh
+# certbot --deploy-hook for the ALL tunnel node's OWN certificate. certbot runs it after every successful renewal with RENEWED_LINEAGE set to the
+# directory of the new certificate. It never trusts that the files are good and never reports success it did not see:
+#   1. the new pair is checked: it is a certificate for THIS node's name, not about to expire, and its key is the key of the certificate;
+#   2. it is installed atomically (key first, then chain; the node reads files it can use and refuses a pair that does not match, so a reader never takes half);
+#   3. the node is told to reload (systemctl reload sends SIGHUP: no restart, no dropped handshake, the streams that are open keep their certificate);
+#   4. when the node's /metrics can be read, it must now report THIS certificate's end. A node that kept the old one is a failure, not a log line.
+# Any failure exits non-zero, so certbot fails, all-tunnel-certbot.service fails and all-tunnel-certbot-failed.service shouts (see that unit).
+set -eu
+umask 077
+here=$(dirname "$0")
+. "${ALL_TUNNEL_LIB:-$here/all-tunnel-cert-lib.sh}"
+
+lineage="${RENEWED_LINEAGE:-}"
+[ -n "$lineage" ] || die "RENEWED_LINEAGE is not set: this script is certbot's deploy hook"
+src_cert="$lineage/fullchain.pem"
+src_key="$lineage/privkey.pem"
+[ -r "$src_cert" ] && [ -r "$src_key" ] || die "the renewed files are missing in $lineage"
+
+host=$(env_value TUNNEL_NODE_HOST)
+dst_cert=$(env_value TUNNEL_CERT_FILE)
+dst_key=$(env_value TUNNEL_KEY_FILE)
+[ -n "$host" ] && [ -n "$dst_cert" ] && [ -n "$dst_key" ] || die "$ALL_TUNNEL_ENV does not say TUNNEL_NODE_HOST, TUNNEL_CERT_FILE and TUNNEL_KEY_FILE"
+
+openssl x509 -in "$src_cert" -noout -checkend 86400 >/dev/null || die "the renewed certificate is already expired or expires within a day"
+openssl x509 -in "$src_cert" -noout -text | grep -Eq "DNS:$host(,|[[:space:]]|\$)" || die "the renewed certificate does not carry this node's name"
+cert_key=$(openssl x509 -in "$src_cert" -noout -pubkey | openssl sha256)
+file_key=$(openssl pkey -in "$src_key" -pubout | openssl sha256)
+[ "$cert_key" = "$file_key" ] || die "the renewed key does not belong to the renewed certificate"
+
+install_atomic() {  # install_atomic MODE SOURCE DESTINATION: copy beside the destination, then rename over it
+  mode=$1; from=$2; to=$3
+  dir=$(dirname "$to")
+  [ -d "$dir" ] || install -d -m 0755 "$dir"
+  tmp="$to.new.$$"
+  install -m "$mode" "$from" "$tmp"
+  owner=$(stat -c %u:%g "$dir" 2>/dev/null || true)   # the node's dynamic user owns its state directory; the files must be readable by it
+  if [ -n "$owner" ] && [ "$(id -u)" -eq 0 ]; then chown "$owner" "$tmp"; fi
+  mv -f "$tmp" "$to"
+}
+install_atomic 0600 "$src_key" "$dst_key"
+install_atomic 0644 "$src_cert" "$dst_cert"
+
+if systemctl is-active --quiet "$ALL_TUNNEL_UNIT"; then
+  systemctl reload "$ALL_TUNNEL_UNIT" || die "the node did not accept the reload"
+  expected=$(not_after_epoch "$src_cert") || expected=""
+  if [ -n "$expected" ]; then
+    seen=""
+    tries=${ALL_TUNNEL_RELOAD_TRIES:-10}
+    i=0
+    while [ "$i" -lt "$tries" ]; do
+      i=$((i + 1))
+      seen=$(metric all_tunnel_node_cert_not_after_seconds)
+      [ -z "$seen" ] && break                       # /metrics cannot be read: the monitor and ct_watch.py still watch the certificate the node serves
+      [ "$seen" = "$expected" ] && break
+      sleep "${ALL_TUNNEL_RELOAD_PAUSE:-1}"
+    done
+    if [ -n "$seen" ] && [ "$seen" != "$expected" ]; then die "the node reloaded but still reports a certificate that ends at $seen, not $expected"; fi
+    [ -n "$seen" ] || say warning "the node's /metrics cannot be read: the new certificate was installed and the node told to reload, but not confirmed"
+  fi
+else
+  say warning "the node is not running: the new certificate is installed, and the node reads it when it starts"
+fi
+say info "node certificate renewed and in service for $host"

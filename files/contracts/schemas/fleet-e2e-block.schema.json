@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/fleet-e2e-block.schema.json",
+  "title": "The `e2e` block of the fleet heartbeat (POST /v1/devices/heartbeat). The five base keys and the optional counters stay as they are (a control plane older than 2.0 refuses any other key with invalid_fleet_health_shape and the device falls back to the base shape); this object is one more optional key. Closed shape: no label, host, device id, address or free text. The Worker keeps only the latest block of each computer (overwritten) and counts over a 24-hour window from list metadata, with no identifier in any count (the contract, WP35 notes). bytes are the device's own totals for period_s. window is the device's random id for that byte window: a resend of an unaccepted window carries the same id and the same bytes, and the Worker adds a window's bytes to the day once (a 48 h marker per computer; a resend read before the first write has spread can still count twice, the contract, WP35 notes).",
+  "type": "object",
+  "required": ["v", "state", "cert_not_after", "nodes_connected", "nodes_configured", "last_error", "clock_skew", "ct_alert", "migrated", "cohort", "eligible", "window", "bytes_in", "bytes_out", "period_s"],
+  "additionalProperties": false,
+  "properties": {
+    "v": {"const": 1},
+    "state": {"type": "string", "enum": ["off", "unenrolled", "waiting", "issuing", "connecting", "ready", "degraded", "clock_skew", "compat_only", "killed"]},
+    "cert_not_after": {"oneOf": [{"type": "null"}, {"$ref": "common.schema.json#/$defs/epoch_s"}]},
+    "nodes_connected": {"type": "integer", "minimum": 0, "maximum": 8},
+    "nodes_configured": {"type": "integer", "minimum": 0, "maximum": 8},
+    "last_error": {"oneOf": [{"type": "null"}, {"$ref": "common.schema.json#/$defs/reason_word"}]},
+    "clock_skew": {"type": "boolean"},
+    "ct_alert": {"type": "boolean"},
+    "migrated": {"type": "boolean"},
+    "cohort": {"type": "string", "enum": ["paid", "trial", "flex", "legacy"]},
+    "eligible": {"type": "boolean"},
+    "window": {"type": "string", "pattern": "^[a-f0-9]{16}$"},
+    "bytes_in": {"$ref": "common.schema.json#/$defs/count"},
+    "bytes_out": {"$ref": "common.schema.json#/$defs/count"},
+    "period_s": {"type": "integer", "minimum": 1, "maximum": 604800}
+  }
+}

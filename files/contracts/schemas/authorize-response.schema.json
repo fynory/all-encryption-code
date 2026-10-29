@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/authorize-response.schema.json",
+  "title": "200 answer of POST /v1/tunnel/authorize. valid_until is paid up to 14400 s, trial and gated at most 900 s and never beyond the trial's end (policy.authorization); status paused keeps the connection but no client stream is opened.",
+  "type": "object",
+  "required": ["ok", "v", "device_id", "label", "host", "status", "plan", "valid_until", "server_time", "policy", "nodes", "e2e_wave", "e2e_kill", "copy_e2ee"],
+  "additionalProperties": false,
+  "properties": {
+    "ok": {"const": true},
+    "v": {"const": 1},
+    "device_id": {"$ref": "common.schema.json#/$defs/device_id"},
+    "label": {"$ref": "common.schema.json#/$defs/label"},
+    "host": {"$ref": "common.schema.json#/$defs/fqdn"},
+    "status": {"$ref": "common.schema.json#/$defs/authorize_status"},
+    "plan": {"type": "string", "enum": ["paid", "trial"]},
+    "valid_until": {"$ref": "common.schema.json#/$defs/epoch_s"},
+    "server_time": {"$ref": "common.schema.json#/$defs/epoch_s"},
+    "policy": {"$ref": "ok-body.schema.json#/properties/policy"},
+    "nodes": {"$ref": "common.schema.json#/$defs/nodes"},
+    "access": {"$ref": "common.schema.json#/$defs/jwt"},
+    "e2e_wave": {"type": "integer", "minimum": 0, "maximum": 100},
+    "e2e_kill": {"type": "boolean"},
+    "copy_e2ee": {"type": "boolean"}
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/node-keys.schema.json",
+  "title": "TUNNEL_NODE_KEYS of the control plane: the public Ed25519 key of each tunnel node. Revoking a node's key is removing its kid; the next request signed by it is refused.",
+  "type": "object",
+  "required": ["keys"],
+  "additionalProperties": false,
+  "properties": {
+    "keys": {
+      "type": "array", "minItems": 1, "maxItems": 16,
+      "items": {
+        "type": "object",
+        "required": ["kid", "node", "kty", "crv", "x"],
+        "additionalProperties": false,
+        "properties": {
+          "kid": {"$ref": "common.schema.json#/$defs/kid"},
+          "node": {"$ref": "common.schema.json#/$defs/node_id"},
+          "kty": {"const": "OKP"},
+          "crv": {"const": "Ed25519"},
+          "x": {"type": "string", "pattern": "^[A-Za-z0-9_-]{43}$"}
+        }
+      }
+    }
+  }
+}

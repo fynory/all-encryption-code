@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/acme-confirm-response.schema.json",
+  "title": "200 answer of confirm and of release.",
+  "type": "object",
+  "required": ["ok", "v", "server_time"],
+  "additionalProperties": false,
+  "properties": {
+    "ok": {"const": true},
+    "v": {"const": 1},
+    "server_time": {"$ref": "common.schema.json#/$defs/epoch_s"}
+  }
+}

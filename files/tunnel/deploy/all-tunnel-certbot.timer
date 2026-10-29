@@ -1,0 +1,14 @@
+# Twice a day, with a random delay so two nodes never renew in the same minute (a renewal reloads the node: see all-tunnel-certbot.service).
+# Persistent: a node that was off at the time renews as soon as it is up. certbot itself only renews a certificate inside its renewal window, so most
+# runs do nothing; what must never happen is a run that fails and nobody hears of it.
+[Unit]
+Description=Twice daily check of the ALL tunnel node's own certificate
+
+[Timer]
+OnCalendar=*-*-* 03,15:00:00
+RandomizedDelaySec=1h
+Persistent=true
+Unit=all-tunnel-certbot.service
+
+[Install]
+WantedBy=timers.target

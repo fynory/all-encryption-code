@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/acme-lift-response.schema.json",
+  "title": "200 answer of POST /v1/commerce/acme/lift: how many of the keys had their slot released.",
+  "type": "object",
+  "required": ["ok", "v", "server_time", "lifted"],
+  "additionalProperties": false,
+  "properties": {
+    "ok": {"const": true},
+    "v": {"const": 1},
+    "server_time": {"$ref": "common.schema.json#/$defs/epoch_s"},
+    "lifted": {"$ref": "common.schema.json#/$defs/count"}
+  }
+}

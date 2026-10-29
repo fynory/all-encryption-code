@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/acme-abandon-request.schema.json",
+  "title": "POST /v1/devices/acme/abandon: the computer's order for this reservation ended without a finalized certificate (a validation that failed, a timeout before the CSR was sent). The broker frees the slot a lapsed reservation would otherwise keep for the whole window, at most policy.budget.abandons_per_label_per_window times per label and window; what it frees in that case it no longer counts for the label either. A computer that did send the CSR never calls this: a certificate may exist, and only the CT reconciliation can lift that hold.",
+  "type": "object",
+  "required": ["v", "reservation_id"],
+  "additionalProperties": false,
+  "properties": {
+    "v": {"const": 1},
+    "reservation_id": {"$ref": "common.schema.json#/$defs/reservation_id"}
+  }
+}

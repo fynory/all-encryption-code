@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/surfaces-file.schema.json",
+  "title": "state_dir()/surfaces.json (mode 0600), written by the agent when the E2E surface listens. The terminator dials only host:port after checking that pid is the agent, and proves the listener holds `secret` (surface identity proof) before it sends the first ChatGPT byte. The secret is new at every start.",
+  "type": "object",
+  "required": ["v", "pid", "host", "port", "secret", "started_at"],
+  "additionalProperties": false,
+  "properties": {
+    "v": {"const": 1},
+    "pid": {"type": "integer", "minimum": 1, "maximum": 4294967295},
+    "host": {"const": "127.0.0.1"},
+    "port": {"type": "integer", "minimum": 1024, "maximum": 65535},
+    "secret": {"type": "string", "pattern": "^[A-Za-z0-9_-]{43}$"},
+    "started_at": {"$ref": "common.schema.json#/$defs/epoch_s"}
+  }
+}

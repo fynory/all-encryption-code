@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/acme-release-request.schema.json",
+  "title": "POST /v1/devices/acme/release: tombstones the label and clears its TXT (uninstall and reinstall). The control plane does the same by itself when the license is released or revoked.",
+  "type": "object",
+  "required": ["v", "reason"],
+  "additionalProperties": false,
+  "properties": {
+    "v": {"const": 1},
+    "reason": {"type": "string", "enum": ["uninstall", "reinstall"]}
+  }
+}

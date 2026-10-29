@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/node-assertion-claims.schema.json",
+  "title": "Claims of the node's assertion (header x-all-node-assertion, JWS typ node-assertion, kid of the node's own Ed25519 key). It authenticates one request of a node to /v1/tunnel/*: bound to the method, the URL and the SHA-256 of the exact body bytes, 60 s, one use (jti). bh of an empty body is the hash of the empty string. sub is the node id that the registered key belongs to. Unknown extra claims are ignored (a token is not a closed shape), the listed ones are not optional unless the schema says so.",
+  "type": "object",
+  "required": ["typ", "ver", "sub", "aud", "htm", "htu", "iat", "exp", "jti", "bh"],
+  "properties": {
+    "typ": {"const": "node-assertion"},
+    "ver": {"const": 1},
+    "sub": {"$ref": "common.schema.json#/$defs/node_id"},
+    "aud": {"const": "all-tunnel-control"},
+    "htm": {"type": "string", "enum": ["GET", "POST"]},
+    "htu": {
+      "type": "string",
+      "maxLength": 2048,
+      "pattern": "^https://[a-z0-9.-]{1,253}(?::[0-9]{1,5})?/v1/tunnel/[a-z]{1,32}(?:\\?[A-Za-z0-9=&_-]{0,64})?$"
+    },
+    "iat": {"$ref": "common.schema.json#/$defs/epoch_s"},
+    "exp": {"$ref": "common.schema.json#/$defs/epoch_s"},
+    "jti": {"$ref": "common.schema.json#/$defs/jti"},
+    "bh": {"$ref": "common.schema.json#/$defs/sha256_b64url"}
+  }
+}

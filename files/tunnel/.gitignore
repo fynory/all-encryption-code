@@ -1,0 +1,4 @@
+# build outputs (build.sh writes to dist/; plain `go build` writes ./tunnel-server)
+/tunnel-server
+/all-tunnel
+/dist/

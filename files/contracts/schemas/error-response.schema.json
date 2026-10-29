@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/error-response.schema.json",
+  "title": "Every non-2xx answer of the end-to-end endpoints: a closed word, never text from the network, never a secret. status is only present next to license_inactive. retry_after_s accompanies 429 and 503.",
+  "type": "object",
+  "required": ["ok", "error"],
+  "additionalProperties": false,
+  "properties": {
+    "ok": {"const": false},
+    "error": {"type": "string", "pattern": "^[a-z_]{1,48}$"},
+    "status": {"type": "string", "pattern": "^[a-z_]{1,32}$"},
+    "retry_after_s": {"type": "integer", "minimum": 1, "maximum": 86400},
+    "enroll_after": {"$ref": "common.schema.json#/$defs/epoch_s"}
+  }
+}

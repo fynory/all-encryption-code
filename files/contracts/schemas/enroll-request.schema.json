@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/enroll-request.schema.json",
+  "title": "POST /v1/devices/e2e/enroll, device to control plane (all-control session plus DPoP, like the fleet heartbeat). Idempotent: install and migrate mint the label once; repair keeps it; reinstall mints a new one and tombstones the old.",
+  "type": "object",
+  "required": ["v", "intent"],
+  "additionalProperties": false,
+  "properties": {
+    "v": {"const": 1},
+    "intent": {"type": "string", "enum": ["install", "repair", "reinstall", "migrate"]}
+  }
+}

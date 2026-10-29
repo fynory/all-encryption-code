@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/proof-claims.schema.json",
+  "title": "Claims of the DPoP proof (header typ dpop+jwt carrying the device's public jwk) the device sends in PROOF and again, with a fresh nonce, after RENEW. htm is GET, htu is https://<node host>[:port if not 443]/all-tunnel/2, ath is base64url(SHA-256(session token)), nonce is the node's CHALLENGE. Unknown extra claims are ignored (a token is not a closed shape), the listed ones are not optional unless the schema says so.",
+  "type": "object",
+  "required": ["sub", "aud", "htm", "htu", "iat", "jti", "ath", "nonce"],
+  "properties": {
+    "sub": {"$ref": "common.schema.json#/$defs/device_id"},
+    "aud": {"const": "all-tunnel"},
+    "htm": {"const": "GET"},
+    "htu": {"type": "string", "maxLength": 300, "pattern": "^https://[a-z0-9.-]{1,253}(?::[0-9]{1,5})?/all-tunnel/2$"},
+    "iat": {"$ref": "common.schema.json#/$defs/epoch_s"},
+    "jti": {"$ref": "common.schema.json#/$defs/jti"},
+    "ath": {"$ref": "common.schema.json#/$defs/sha256_b64url"},
+    "nonce": {"$ref": "common.schema.json#/$defs/nonce"}
+  }
+}

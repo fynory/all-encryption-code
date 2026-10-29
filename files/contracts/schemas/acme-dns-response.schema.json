@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/acme-dns-response.schema.json",
+  "title": "200 answer of acme dns (set and clear).",
+  "type": "object",
+  "required": ["ok", "v", "name", "type", "ttl"],
+  "additionalProperties": false,
+  "properties": {
+    "ok": {"const": true},
+    "v": {"const": 1},
+    "name": {"$ref": "common.schema.json#/$defs/acme_name"},
+    "type": {"const": "TXT"},
+    "ttl": {"type": "integer", "minimum": 1, "maximum": 3600}
+  }
+}

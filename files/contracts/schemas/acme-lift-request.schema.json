@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/acme-lift-request.schema.json",
+  "title": "POST /v1/commerce/acme/lift, the commerce key (a write): the CT reconciliation found no certificate for these keys in the logs, so the slot their lapsed reservation keeps is released. The broker lifts only a key that is a lapsed first reservation at least policy.budget.lapsed_lift_after_s past its end; any other key in the list is left as it is. The key stays recorded and expected for ever, so a certificate that turns up later is still not foreign.",
+  "type": "object",
+  "required": ["v", "spki_sha256"],
+  "additionalProperties": false,
+  "properties": {
+    "v": {"const": 1},
+    "spki_sha256": {"type": "array", "minItems": 1, "maxItems": 100, "items": {"$ref": "common.schema.json#/$defs/sha256_b64url"}}
+  }
+}

@@ -1,0 +1,25 @@
+# Renews the node's OWN certificate (the name the devices connect to, ALPN all-tunnel/2) with certbot, HTTP-01 through the webroot the node serves on :80.
+# Devices' names never come here: their certificates are issued on the devices over DNS-01 (the design plan, section 4).
+#
+# It fails LOUDLY, on purpose, and in three places a silent failure would hide:
+#   certbot renew             exits non-zero when a renewal was due and failed (no `|| true`, no `-q` that swallows the reason)
+#   --deploy-hook             all-tunnel-cert-hook: checks the new pair, installs it, reloads the node, and fails when the node did not take it
+#   ExecStartPost             all-tunnel-cert-check: fails when the certificate in service has less than ALL_TUNNEL_CERT_MIN_DAYS left, which is what
+#                             a renewal that "succeeded" but never replaced anything looks like
+# and any failure runs all-tunnel-certbot-failed.service (a critical journal line, a marker file `tunnel_deploy.py status` reports). The days are the
+# first alert of policy.monitoring.node_cert_alert_days (14): the site monitor mails the owner at 14 and at 5 days anyway, this is the node's own voice.
+[Unit]
+Description=Renew the ALL tunnel node's own certificate (certbot, HTTP-01 webroot)
+Wants=network-online.target
+After=network-online.target
+OnFailure=all-tunnel-certbot-failed.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/all-tunnel/env
+Environment=ALL_TUNNEL_CERT_MIN_DAYS=14
+ExecStart=/usr/bin/certbot renew --non-interactive --no-random-sleep-on-renew --deploy-hook /usr/local/sbin/all-tunnel-cert-hook
+ExecStartPost=/usr/local/sbin/all-tunnel-cert-check
+TimeoutStartSec=15min
+PrivateTmp=yes
+NoNewPrivileges=yes

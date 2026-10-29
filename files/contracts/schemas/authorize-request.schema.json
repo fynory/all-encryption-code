@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/authorize-request.schema.json",
+  "title": "POST /v1/tunnel/authorize, node to control plane (authenticated by the node assertion header, never by anything a device sends). The node never sends a host name: the control plane answers it from the device id.",
+  "type": "object",
+  "required": ["v", "device_id", "session_jti", "reason", "node"],
+  "additionalProperties": false,
+  "properties": {
+    "v": {"const": 1},
+    "device_id": {"$ref": "common.schema.json#/$defs/device_id"},
+    "session_jti": {"$ref": "common.schema.json#/$defs/jti"},
+    "reason": {"type": "string", "enum": ["hello", "renew"]},
+    "node": {"$ref": "common.schema.json#/$defs/node_id"}
+  }
+}

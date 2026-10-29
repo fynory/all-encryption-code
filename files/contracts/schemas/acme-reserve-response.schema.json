@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/acme-reserve-response.schema.json",
+  "title": "200 answer of reserve. Over budget is NEVER an error: status deferred carries enroll_after (with jitter) and the device keeps whatever certificate it has. A granted reservation that is not confirmed within policy.budget.reservation_ttl_s frees its slot.",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": ["ok", "v", "status", "reservation_id", "class", "expires_at", "server_time"],
+      "additionalProperties": false,
+      "properties": {
+        "ok": {"const": true},
+        "v": {"const": 1},
+        "status": {"const": "granted"},
+        "reservation_id": {"$ref": "common.schema.json#/$defs/reservation_id"},
+        "class": {"$ref": "common.schema.json#/$defs/budget_class"},
+        "expires_at": {"$ref": "common.schema.json#/$defs/epoch_s"},
+        "server_time": {"$ref": "common.schema.json#/$defs/epoch_s"}
+      }
+    },
+    {
+      "type": "object",
+      "required": ["ok", "v", "status", "enroll_after", "server_time"],
+      "additionalProperties": false,
+      "properties": {
+        "ok": {"const": true},
+        "v": {"const": 1},
+        "status": {"const": "deferred"},
+        "enroll_after": {"$ref": "common.schema.json#/$defs/epoch_s"},
+        "server_time": {"$ref": "common.schema.json#/$defs/epoch_s"}
+      }
+    }
+  ]
+}

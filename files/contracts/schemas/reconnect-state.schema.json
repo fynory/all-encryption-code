@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/reconnect-state.schema.json",
+  "title": "The `reconnect` member of the 200 answer of GET /v1/devices/authorize (the relay path), WP21 reads it and WP26 writes it. Absent for a computer that must never see the card (Lifetime without updates, a legacy credential, a network that blocks 443, a computer that is not on 2.x, a computer whose encrypted path is not ready) and for every computer while the kill switch is on or the retirement criteria are not met. `eligible`: it can reach 2.x, its own self-check passed and it has not moved yet. `migrated`: it served a tool call on its encrypted address; `since` is that moment in epoch milliseconds. `locale` is the language the person signed up in (absent when unknown).",
+  "type": "object",
+  "required": ["state"],
+  "additionalProperties": false,
+  "properties": {
+    "state": {"type": "string", "enum": ["eligible", "migrated"]},
+    "since": {"type": "integer", "minimum": 1, "maximum": 4102444799999},
+    "locale": {"type": "string", "enum": ["es", "en"]}
+  }
+}

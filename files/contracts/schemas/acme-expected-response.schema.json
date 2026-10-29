@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/acme-expected-response.schema.json",
+  "title": "GET /v1/commerce/acme/expected?after=<cursor>&limit=<n>, commerce key, read only: every key the broker has recorded for any label, in the order it was recorded, so that a CT watcher can tell an expected certificate from a mis-issued one. state reserved = recorded before the order and not yet confirmed (a certificate for it may exist), issued = confirmed, expired = never confirmed within the reservation lifetime (a certificate for it may still exist), released = replaced by a newer reservation before use. retired = the label is a tombstone. next is the cursor of the following page, null at the end.",
+  "type": "object",
+  "required": ["ok", "v", "server_time", "entries", "next"],
+  "additionalProperties": false,
+  "properties": {
+    "ok": {"const": true},
+    "v": {"const": 1},
+    "server_time": {"$ref": "common.schema.json#/$defs/epoch_s"},
+    "entries": {
+      "type": "array",
+      "maxItems": 500,
+      "items": {
+        "type": "object",
+        "required": ["label", "host", "spki_sha256", "state", "recorded_at", "not_before", "not_after", "retired"],
+        "additionalProperties": false,
+        "properties": {
+          "label": {"$ref": "common.schema.json#/$defs/label"},
+          "host": {"$ref": "common.schema.json#/$defs/fqdn"},
+          "spki_sha256": {"$ref": "common.schema.json#/$defs/sha256_b64url"},
+          "state": {"type": "string", "enum": ["reserved", "issued", "expired", "released"]},
+          "recorded_at": {"$ref": "common.schema.json#/$defs/epoch_s"},
+          "not_before": {"oneOf": [{"type": "null"}, {"$ref": "common.schema.json#/$defs/epoch_s"}]},
+          "not_after": {"oneOf": [{"type": "null"}, {"$ref": "common.schema.json#/$defs/epoch_s"}]},
+          "retired": {"type": "boolean"}
+        }
+      }
+    },
+    "next": {"oneOf": [{"type": "null"}, {"$ref": "common.schema.json#/$defs/count"}]}
+  }
+}

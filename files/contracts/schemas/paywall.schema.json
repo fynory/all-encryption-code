@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/paywall.schema.json",
+  "title": "The plans card inside a paywall statement: the shape the paywall module parse_paywall accepts (the device keeps its own field-by-field parser, which is stricter: distinct plan ids, byte limits, control characters).",
+  "type": "object",
+  "required": ["version", "status", "plan", "trial_ended_at", "upgrade_url", "plans", "note_es", "note_en", "text_es", "text_en"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {"const": 1},
+    "status": {"const": "trial_ended"},
+    "plan": {"const": "trial"},
+    "trial_ended_at": {"$ref": "common.schema.json#/$defs/epoch_ms"},
+    "locale": {"type": "string", "enum": ["es", "en"]},
+    "upgrade_url": {"type": "string", "pattern": "^https://all-mcp\\.fyi/upgrade/(?:\\?lang=(?:es|en))?#[A-Za-z0-9._&=-]{8,400}$"},
+    "plans": {
+      "type": "array", "minItems": 3, "maxItems": 3,
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "amount", "cadence", "updates", "computers"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "enum": ["monthly", "no_updates", "with_updates"]},
+          "label": {"type": "string", "minLength": 1, "maxLength": 64},
+          "amount": {"type": "string", "pattern": "^\\$[0-9]+\\.[0-9][0-9]$"},
+          "cadence": {"type": "string", "enum": ["monthly", "one_time"]},
+          "updates": {"type": "boolean"},
+          "computers": {"type": "integer", "minimum": 1, "maximum": 25}
+        }
+      }
+    },
+    "reactivation": {"type": "string", "minLength": 1, "maxLength": 200},
+    "is_error": {"type": "boolean"},
+    "note_es": {"type": "string", "minLength": 1, "maxLength": 2048},
+    "note_en": {"type": "string", "minLength": 1, "maxLength": 2048},
+    "text_es": {"type": "string", "minLength": 1, "maxLength": 2048},
+    "text_en": {"type": "string", "minLength": 1, "maxLength": 2048}
+  }
+}

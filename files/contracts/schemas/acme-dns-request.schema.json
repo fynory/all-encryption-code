@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/acme-dns-request.schema.json",
+  "title": "POST /v1/devices/acme/dns. Needs a live reservation. The only name that can ever be written is _acme-challenge.<the caller's own host>, type TXT, a 43-character value, TTL policy.certificates.txt_ttl_s: nothing in the request names a record.",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": ["v", "reservation_id", "action", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "v": {"const": 1},
+        "reservation_id": {"$ref": "common.schema.json#/$defs/reservation_id"},
+        "action": {"const": "set"},
+        "value": {"type": "string", "pattern": "^[A-Za-z0-9_-]{43}$"}
+      }
+    },
+    {
+      "type": "object",
+      "required": ["v", "reservation_id", "action"],
+      "additionalProperties": false,
+      "properties": {
+        "v": {"const": 1},
+        "reservation_id": {"$ref": "common.schema.json#/$defs/reservation_id"},
+        "action": {"const": "clear"}
+      }
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/ok-body.schema.json",
+  "title": "Body of the node's OK line (answer to HELLO and to RENEW): what the control plane decided, relayed to the device. The windows of `policy` are the node's offer, capped at a day only to refuse nonsense: the device clamps each one to its own policy.json (WP13), it never trusts the offer beyond it.",
+  "type": "object",
+  "required": ["v", "node", "host", "status", "valid_until", "server_time", "policy"],
+  "additionalProperties": false,
+  "properties": {
+    "v": {"const": 2},
+    "node": {"$ref": "common.schema.json#/$defs/node_id"},
+    "host": {"$ref": "common.schema.json#/$defs/fqdn"},
+    "status": {"$ref": "common.schema.json#/$defs/authorize_status"},
+    "valid_until": {"$ref": "common.schema.json#/$defs/epoch_s"},
+    "server_time": {"$ref": "common.schema.json#/$defs/epoch_s"},
+    "policy": {
+      "type": "object",
+      "required": ["ping_interval_s", "dead_peer_s", "stream_idle_s", "stream_max_age_s", "renew_before_valid_until_s"],
+      "additionalProperties": false,
+      "properties": {
+        "ping_interval_s": {"type": "integer", "minimum": 1, "maximum": 86400},
+        "dead_peer_s": {"type": "integer", "minimum": 1, "maximum": 86400},
+        "stream_idle_s": {"type": "integer", "minimum": 1, "maximum": 86400},
+        "stream_max_age_s": {"type": "integer", "minimum": 1, "maximum": 86400},
+        "renew_before_valid_until_s": {"type": "integer", "minimum": 1, "maximum": 86400}
+      }
+    }
+  }
+}

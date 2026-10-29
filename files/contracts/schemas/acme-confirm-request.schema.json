@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/acme-confirm-request.schema.json",
+  "title": "POST /v1/devices/acme/confirm. The budget is consumed here, not at reserve. spki_sha256 must be the one reserved.",
+  "type": "object",
+  "required": ["v", "reservation_id", "spki_sha256", "not_before", "not_after"],
+  "additionalProperties": false,
+  "properties": {
+    "v": {"const": 1},
+    "reservation_id": {"$ref": "common.schema.json#/$defs/reservation_id"},
+    "spki_sha256": {"$ref": "common.schema.json#/$defs/sha256_b64url"},
+    "not_before": {"$ref": "common.schema.json#/$defs/epoch_s"},
+    "not_after": {"$ref": "common.schema.json#/$defs/epoch_s"}
+  }
+}

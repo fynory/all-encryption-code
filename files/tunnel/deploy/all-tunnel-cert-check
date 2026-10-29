@@ -1,0 +1,27 @@
+#!/bin/sh
+# Runs after every `certbot renew` of the node's own certificate (ExecStartPost of all-tunnel-certbot.service) and fails when the certificate is not
+# healthy. certbot exits 0 when nothing was due, and also when a renewal "worked" but nothing downstream took it, so a green renewal proves nothing: this
+# looks at what the node is actually serving.
+#   - the certificate file must have more than ALL_TUNNEL_CERT_MIN_DAYS left (the first of policy.monitoring.node_cert_alert_days: 14);
+#   - when /metrics can be read, the certificate IN SERVICE must too (a renewed file that was never reloaded is the other silent failure).
+# Success clears the failure marker all-tunnel-certbot-failed.service writes.
+set -eu
+here=$(dirname "$0")
+. "${ALL_TUNNEL_LIB:-$here/all-tunnel-cert-lib.sh}"
+
+min_days="${ALL_TUNNEL_CERT_MIN_DAYS:-}"
+[ -n "$min_days" ] || die "ALL_TUNNEL_CERT_MIN_DAYS is not set"
+cert=$(env_value TUNNEL_CERT_FILE)
+[ -n "$cert" ] || die "$ALL_TUNNEL_ENV does not say TUNNEL_CERT_FILE"
+[ -r "$cert" ] || die "the node certificate $cert cannot be read"
+
+openssl x509 -in "$cert" -noout -checkend $((min_days * 86400)) >/dev/null ||
+  die "the node certificate has less than $min_days days left: the renewal is not happening (journalctl -u all-tunnel-certbot)"
+
+left=$(metric all_tunnel_node_cert_seconds_left)
+if [ -n "$left" ] && [ "$left" -lt $((min_days * 86400)) ]; then
+  die "the node serves a certificate with less than $min_days days left although the file on disk is newer: reload the node (systemctl reload all-tunnel)"
+fi
+
+rm -f "${ALL_TUNNEL_STATE_DIR:-/var/lib/all-tunnel}/certbot.failed"
+say info "node certificate has more than $min_days days left"

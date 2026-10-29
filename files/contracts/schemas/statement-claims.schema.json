@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/statement-claims.schema.json",
+  "title": "Claims of the control plane's signed access statement (typ device-access, aud all-device-access), as pushed by the node in STATEMENT and as returned next to authorize. Same keys and typ as 1.1 (ver stays 1: a 1.1 device ignores the added claims); seq is what makes an old statement unable to lift a pause or a paywall. Lifetime: mode active up to policy.authorization.access_ttl_paid_s (a verifier cannot tell a trial from a paid statement; the control plane issues access_ttl_trial_s for a trial and never past its end), mode paywall up to access_ttl_paywall_s. paused and resumed are never both present. paused.since and resumed.at are the license page's click moments in milliseconds (the 1.1 authorize shape). Unknown extra claims are ignored (a token is not a closed shape), the listed ones are not optional unless the schema says so.",
+  "type": "object",
+  "required": ["typ", "ver", "iss", "aud", "sub", "iat", "exp", "jti", "mode", "seq"],
+  "properties": {
+    "typ": {"const": "device-access"},
+    "ver": {"const": 1},
+    "iss": {"const": "https://api.all-mcp.fyi"},
+    "aud": {"const": "all-device-access"},
+    "sub": {"$ref": "common.schema.json#/$defs/device_id"},
+    "iat": {"$ref": "common.schema.json#/$defs/epoch_s"},
+    "exp": {"$ref": "common.schema.json#/$defs/epoch_s"},
+    "jti": {"$ref": "common.schema.json#/$defs/jti"},
+    "mode": {"type": "string", "enum": ["active", "paywall"]},
+    "seq": {"type": "integer", "minimum": 1, "maximum": 9007199254740991},
+    "paywall": {"$ref": "paywall.schema.json"},
+    "paused": {
+      "type": "object",
+      "required": ["since"],
+      "additionalProperties": false,
+      "properties": {"since": {"$ref": "common.schema.json#/$defs/epoch_ms"}}
+    },
+    "resumed": {
+      "type": "object",
+      "required": ["at"],
+      "additionalProperties": false,
+      "properties": {"at": {"$ref": "common.schema.json#/$defs/epoch_ms"}}
+    }
+  }
+}

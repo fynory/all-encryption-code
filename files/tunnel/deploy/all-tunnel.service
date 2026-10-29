@@ -1,0 +1,67 @@
+# systemd unit for the ALL tunnel node (Ubuntu 24.04). `the deploy tool bootstrap` installs it with everything around it (the node runbook):
+#
+#   /opt/all-tunnel/releases/<id>/all-tunnel      one directory per release, named by the first 16 hex characters of the binary's SHA-256
+#   /opt/all-tunnel/current -> releases/<id>      what runs; /opt/all-tunnel/previous is what a rollback flips back to
+#   /usr/local/bin/all-tunnel -> /opt/all-tunnel/current/all-tunnel
+#   /etc/all-tunnel/env                           TUNNEL_NODE_ID, TUNNEL_NODE_KID, TUNNEL_NODE_HOST and the certificate paths (0600)
+#   /etc/all-tunnel/node.key                      the node's one secret, made ON the node (`all-tunnel -node-key-init`); only its public half is ever printed
+#
+# Two listeners and no other: :443 (devices' control and data connections on the node's own name, clients of devices on every other name) and :80 (the
+# node's own ACME webroot, nothing else). The node holds no secret of devices: it verifies their sessions against the control plane's published keys
+# and asks the control plane what each may do, signing every request with its own Ed25519 key, the only secret it has: systemd hands it over as a
+# credential (LoadCredential below), so the service's dynamic user reads it and nobody else does. The control plane's address defaults to the one the
+# policy pins (TUNNEL_CONTROL_URL changes it for a staging node).
+#
+# /metrics and /healthz listen on 127.0.0.1:9101 (TUNNEL_METRICS_ADDR changes the port, and refuses an address that is not loopback): aggregate
+# counters only, nothing per device, nothing with an address or a name in it. The kernel side of the limits is nftables.conf and sysctl.conf next to
+# this file; the node does not load them (it has no privilege to). Nothing the node writes to the journal names an address or a SNI, and
+# journald-volatile.conf keeps the journal in memory anyway: nothing of a node survives a reboot but its key and its certificate.
+#
+# systemctl stop / restart sends SIGTERM, which DRAINS: no new clients, the open streams finish, and the node leaves when they are gone or after the
+# quiet period (TUNNEL_DRAIN_QUIET, 20 minutes by default, policy timing.drain_quiet_s), so TimeoutStopSec must be longer than that
+# (the deploy tests hold the two together). systemctl reload re-reads the node's certificate (SIGHUP). Deploy one node at a time, after
+# taking its address out of the DNS (the design plan, section 5, the node runbook).
+[Unit]
+Description=ALL tunnel node (SNI router, never decrypts)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+EnvironmentFile=/etc/all-tunnel/env
+Environment=TUNNEL_NODE_KEY_FILE=%d/node-key
+Environment=TUNNEL_OPENAI_PREFIXES_CACHE=%S/all-tunnel/openai-prefixes.json
+LoadCredential=node-key:/etc/all-tunnel/node.key
+ExecStart=/usr/local/bin/all-tunnel
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=2
+DynamicUser=yes
+StateDirectory=all-tunnel
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+ProtectProc=invisible
+# no ProcSubset=pid: it hides /proc/sys, and Go reads /proc/sys/net/core/somaxconn for its listen backlog (sysctl.conf raises it to 4096 for the reconnection
+# storm); without the file the node falls back to 128
+LockPersonality=yes
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+RestrictAddressFamilies=AF_INET AF_INET6
+SystemCallArchitectures=native
+UMask=0077
+LimitNOFILE=65536
+TimeoutStopSec=1500
+
+[Install]
+WantedBy=multi-user.target

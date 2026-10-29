@@ -1,0 +1,376 @@
+{
+  "$comment": "ALL 2.0 policy table: the ONE place where a number, a window or a limit of the end-to-end path is written down (plan section 0 and 7.1). The tunnel node (Go), the control plane (TypeScript) and the device (Python) read it; nobody copies a value into code (the contract generator lint fails the suite when one does). Units are in the key suffix: _s seconds, _bytes, _days, _pct percent. Keys listed in `provisional` are the plan's initial values: they are retuned after G0 and G1 and ONLY here.",
+  "version": 1,
+  "provisional": [
+    "timing.stream_idle_s",
+    "timing.stream_max_age_s",
+    "timing.ping_interval_s",
+    "timing.dead_peer_s",
+    "node_limits.per_ip_concurrent",
+    "node_limits.per_ip_new_per_s",
+    "node_limits.label_streams_max",
+    "node_limits.label_anon_slice",
+    "node_limits.label_hint_slice",
+    "node_limits.global_streams_max",
+    "node_limits.openai_reserved_pct",
+    "node_limits.openai_per_ip_factor",
+    "node_limits.device_per_ip_factor",
+    "node_limits.ip_table_max",
+    "node_limits.unknown_sni_per_ip",
+    "node_limits.unknown_sni_window_s",
+    "node_limits.unknown_sni_ban_s",
+    "node_limits.label_new_per_s",
+    "node_limits.label_new_burst",
+    "node_limits.hint_addresses_per_label",
+    "terminator.endpoint_budgets",
+    "terminator.max_streams",
+    "budget.borrow_from",
+    "budget.defer_jitter_s",
+    "budget.dns_calls_per_reservation",
+    "budget.reservations_per_label_per_day",
+    "budget.trial_per_ip_per_window",
+    "budget.trial_per_email_domain_per_window",
+    "budget.trial_per_mailbox_per_window",
+    "budget.lapsed_lift_after_s",
+    "budget.abandons_per_label_per_window",
+    "monitoring.lapsed_held_alert",
+    "monitoring.jwks_age_alert_s",
+    "monitoring.authorize_window_s",
+    "monitoring.authorize_fail_alert_pct",
+    "monitoring.authorize_fail_min_calls",
+    "monitoring.criteria_min_coverage_pct",
+    "migration.connected_now_s",
+    "migration.migrate_floor_pct",
+    "migration.lend_horizon_s",
+    "migration.ineligible_hold_s",
+    "migration.retire.min_days_since_ready",
+    "migration.retire.sustain_days",
+    "migration.retire.node_availability_permille_min",
+    "migration.retire.authorize_failure_pct_max",
+    "migration.retire.migrated_pct_min",
+    "migration.retire.open_kill_events_max",
+    "dns_failover.remove_after_failures",
+    "dns_failover.restore_after_successes",
+    "dns_failover.min_change_interval_s",
+    "concierge.turns_per_session",
+    "concierge.mutations_per_session"
+  ],
+
+  "protocol": {
+    "version": 2,
+    "alpn": "all-tunnel/2",
+    "line_max_bytes": 8192,
+    "open_line_max_bytes": 192,
+    "statement_line_max_bytes": 65552,
+    "jwt_max_bytes": 4096,
+    "first_line_timeout_s": 10,
+    "attach_timeout_s": 10,
+    "stream_id_bytes": 16,
+    "attach_secret_bytes": 32,
+    "nonce_bytes": 16,
+    "hint_max_addresses": 16,
+    "proof_htm": "GET",
+    "proof_htu_path": "/all-tunnel/2",
+    "node_assertion_header": "x-all-node-assertion",
+    "source_classes": ["openai", "hint", "anon"],
+    "close_reasons": ["replaced", "revoked", "expired", "released", "killed", "paused", "drain", "idle", "protocol", "shutdown"],
+    "error_codes": [
+      "bad_hello", "bad_command", "unsupported_version", "bad_proof", "auth", "clock_skew", "unknown_stream", "bad_attach",
+      "license_inactive", "device_revoked", "paused", "busy", "control_unavailable", "line_too_long"
+    ]
+  },
+
+  "timing": {
+    "ping_interval_s": 20,
+    "dead_peer_s": 45,
+    "stream_idle_s": 1800,
+    "stream_max_age_s": 14400,
+    "half_close_s": 30,
+    "backoff_min_s": 1,
+    "backoff_max_s": 60,
+    "renew_before_valid_until_s": 300,
+    "drain_quiet_s": 1200,
+    "feed_poll_s": 15,
+    "feed_apply_deadline_s": 20,
+    "reconnect_after_wake_s": 5
+  },
+
+  "authorization": {
+    "valid_until_paid_s": 14400,
+    "valid_until_trial_s": 900,
+    "valid_until_gated_s": 900,
+    "grace_paid_s": 900,
+    "authorize_max_concurrent": 50,
+    "session_ttl_s": 300,
+    "proof_ttl_s": 60,
+    "node_assertion_ttl_s": 60,
+    "node_skew_s": 5,
+    "node_skew_max_s": 30,
+    "access_ttl_paid_s": 14400,
+    "access_ttl_trial_s": 600,
+    "access_ttl_paywall_s": 600,
+    "access_future_slack_s": 60,
+    "stripe_status_cache_s": 120,
+    "last_seen_write_interval_s": 300
+  },
+
+  "gated": {
+    "bytes_per_day": 10485760,
+    "streams_per_day": 200,
+    "cutoff_days": 14
+  },
+
+  "license": {
+    "revoked_notice_days": 7
+  },
+
+  "identity": {
+    "issuer": "https://api.all-mcp.fyi",
+    "aud_tunnel": "all-tunnel",
+    "aud_access": "all-device-access",
+    "aud_node_assertion": "all-tunnel-control",
+    "label_length": 20,
+    "label_alphabet": "abcdefghijklmnopqrstuvwxyz234567",
+    "label_regex": "^[a-z2-7]{20}$",
+    "fqdn_regex": "^[a-z2-7]{20}\\.(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$",
+    "fqdn_max_length": 253,
+    "tombstone_idle_months": 12,
+    "device_id_regex": "^[a-f0-9]{32}$",
+    "stream_id_regex": "^[0-9a-f]{32}$",
+    "attach_secret_regex": "^[A-Za-z0-9_-]{43}$",
+    "nonce_regex": "^[A-Za-z0-9_-]{22,64}$",
+    "jti_regex": "^[A-Za-z0-9_-]{16,128}$",
+    "kid_regex": "^[A-Za-z0-9._-]{1,128}$"
+  },
+
+  "jwks": {
+    "cache_s": 300,
+    "max_keys": 16,
+    "stale_fail_closed_s": 1800
+  },
+
+  "node_limits": {
+    "client_hello_deadline_s": 5,
+    "per_ip_concurrent": 16,
+    "per_ip_new_per_s": 10,
+    "ipv6_prefix_bits": 64,
+    "label_streams_max": 64,
+    "label_anon_slice": 16,
+    "label_hint_slice": 48,
+    "hint_ttl_s": 900,
+    "global_streams_max": 2048,
+    "openai_reserved_pct": 25,
+    "openai_prefix_refresh_s": 86400,
+    "openai_prefix_max": 2048,
+    "openai_prefix_min_v4_bits": 16,
+    "openai_prefix_min_v6_bits": 32,
+    "openai_prefix_body_max_bytes": 1048576,
+    "openai_per_ip_factor": 8,
+    "device_per_ip_factor": 8,
+    "ip_table_max": 65536,
+    "unknown_sni_per_ip": 20,
+    "unknown_sni_window_s": 60,
+    "unknown_sni_ban_s": 600,
+    "label_new_per_s": 20,
+    "label_new_burst": 32,
+    "hint_addresses_per_label": 64,
+    "tcp_keepalive_s": 30,
+    "max_unauthenticated_control": 256
+  },
+
+  "terminator": {
+    "tls_handshake_s": 10,
+    "request_head_s": 10,
+    "request_head_max_bytes": 16384,
+    "max_streams": 64,
+    "endpoint_budgets": {
+      "register": {"per_ip_per_min": 20},
+      "authorize": {"per_ip_per_min": 60},
+      "token": {"per_ip_per_min": 120},
+      "pair": {"per_ip_per_min": 30},
+      "mcp_anonymous": {"per_ip_per_min": 60}
+    },
+    "tls_min_version": "TLSv1.3",
+    "tls_alpn": "http/1.1"
+  },
+
+  "surface": {
+    "body_max_bytes": 16777216,
+    "headers_max": 64,
+    "header_value_max_bytes": 32768,
+    "keep_alive_s": 75,
+    "limiter_lru_max": 4096,
+    "never_authorized_client_evict_hours": 24,
+    "identity_path": "/__all/surface/v1/proof",
+    "identity_challenge_header": "x-all-challenge",
+    "identity_mac_header": "x-all-challenge-mac",
+    "identity_proof_header": "x-all-surface-proof"
+  },
+
+  "pairing": {
+    "window_s": 600,
+    "code_ttl_e2e_s": 600,
+    "code_ttl_local_s": 86400,
+    "max_codes_local": 16,
+    "bad_codes_burn": 5
+  },
+
+  "certificates": {
+    "profile": "tlsserver",
+    "profile_fallback": "classic",
+    "profile_days": 45,
+    "renew_backstop_divisor": 3,
+    "ari_checks_per_day": 2,
+    "min_attempt_gap_s": 21600,
+    "max_issuances_per_day": 2,
+    "txt_ttl_s": 60,
+    "txt_value_length": 43,
+    "ct_check_interval_s": 86400,
+    "ct_degraded_after_s": 259200,
+    "wait_after_install_s": 300
+  },
+
+  "dns": {
+    "a_record_ttl_s": 60,
+    "devices_caa": ["0 issue \"letsencrypt.org; validationmethods=dns-01\"", "0 issuewild \";\""],
+    "node_caa": ["0 issue \"letsencrypt.org\""]
+  },
+
+  "budget": {
+    "window_days": 7,
+    "first_issuances_total": 40,
+    "classes": {"paid": 20, "trial": 12, "flex": 8},
+    "borrow_only_unreserved_hours": 24,
+    "per_label_per_window": 3,
+    "per_license_per_day": 2,
+    "reservation_ttl_s": 900,
+    "alert_pct": 70,
+    "borrow_from": {"paid": ["flex", "trial"], "trial": ["flex"], "flex": ["trial"]},
+    "defer_jitter_s": 7200,
+    "dns_calls_per_reservation": 8,
+    "reservations_per_label_per_day": 8,
+    "lapsed_lift_after_s": 93600,
+    "abandons_per_label_per_window": 3,
+    "trial_per_ip_per_window": 3,
+    "trial_per_email_domain_per_window": 3,
+    "trial_per_mailbox_per_window": 2,
+    "free_mail_domains": [
+      "gmail.com", "googlemail.com", "outlook.com", "hotmail.com", "live.com", "msn.com", "yahoo.com", "icloud.com", "me.com", "aol.com",
+      "proton.me", "protonmail.com", "gmx.com", "yandex.com", "mail.com", "zoho.com"
+    ]
+  },
+
+  "monitoring": {
+    "node_probe_interval_s": 300,
+    "probe_failures_to_alert": 2,
+    "node_cert_alert_days": [14, 5],
+    "ct_watch_interval_s": 900,
+    "lapsed_held_alert": 3,
+    "device_cert_expiring_days": 10,
+    "fleet_e2e_retention_s": 2592000,
+    "fleet_e2e_window_s": 86400,
+    "fleet_e2e_window_dedup_s": 172800,
+    "fleet_e2e_window_dedup_max": 8,
+    "jwks_age_alert_s": 900,
+    "authorize_bucket_s": 300,
+    "authorize_window_s": 900,
+    "authorize_fail_alert_pct": 10,
+    "authorize_fail_min_calls": 20,
+    "authorize_tally_keep_s": 259200,
+    "criteria_min_coverage_pct": 90
+  },
+
+  "dns_failover": {
+    "remove_after_failures": 3,
+    "restore_after_successes": 5,
+    "min_change_interval_s": 600,
+    "min_in_rotation": 1,
+    "record_ttl_s": 60,
+    "hold_default_s": 7200,
+    "hold_max_s": 86400,
+    "log_entries": 50
+  },
+
+  "release": {
+    "proof_max_age_h": 72
+  },
+
+  "migration": {
+    "legacy_close_after_days": 30,
+    "delete_old_connector_after_days": 7,
+    "connected_now_s": 300,
+    "wave_hash_prefix": "all-e2e-wave-v1/",
+    "default_wave_pct": 100,
+    "min_lead_s": 60,
+    "min_version": "2.0.0",
+    "ready_report_max_age_s": 86400,
+    "verdict_cache_s": 300,
+    "migrate_floor_pct": 50,
+    "lend_horizon_s": 86400,
+    "ineligible_hold_s": 604800,
+    "enroll_refresh_min_s": 900,
+    "enroll_refresh_max_s": 1800,
+    "kill_apply_deadline_s": 3600,
+    "blocked_after_failures": 3,
+    "blocked_retry_s": 21600,
+    "retire": {
+      "$note": "The owner's figures of 2026-10-27 for retiring the old relay: every one of the last 30 complete UTC days has the nodes up at least 99.5 percent (_permille is thousandths: 995 is 99.5 percent, because nothing in this file is a fraction) and authorize failures at most 1 percent, and at least 95 percent of the eligible computers that enrolled have migrated. Even then the relay is retired only on the owner's explicit order.",
+      "min_days_since_ready": 14,
+      "sustain_days": 30,
+      "node_availability_permille_min": 995,
+      "authorize_failure_pct_max": 1,
+      "migrated_pct_min": 95,
+      "open_kill_events_max": 0
+    },
+    "selfcheck": {
+      "timeout_s": 10,
+      "min_interval_s": 60
+    }
+  },
+
+  "keep_awake": {
+    "hold_cap_s": 28800,
+    "release_grace_s": 5,
+    "reconcile_s": 2
+  },
+
+  "concierge": {
+    "$comment": "Robi concierge (owner order of 2026-10-27): a customer who proves an email with a one-time code gets a short session in which Robi can fix that customer's own account. Refund rules are the owner's exact ones and are in the Terms: a refund is refused when ALL ran more than max_actions_in_window actions in the refund window (monthly: the 3 days since the charge; lifetime: the 5 days since purchase). Not provisional: the owner set the number.",
+    "session_s": 1800,
+    "code_sends_per_net_hour": 6,
+    "code_checks_per_net_hour": 30,
+    "chat_turns_per_net_hour": 60,
+    "turns_per_day_total": 2000,
+    "voice_calls_per_session": 80,
+    "summary_chars_max": 800,
+    "turns_per_session": 40,
+    "tool_rounds_per_turn": 6,
+    "mutations_per_session": 8,
+    "history_messages_max": 16,
+    "user_chars_max": 1400,
+    "assistant_chars_max": 6000,
+    "history_chars_max": 24000,
+    "output_tokens_max": 1024,
+    "model_deadline_s": 25,
+    "audit_retention_days": 400,
+    "refund": {
+      "monthly_window_h": 72,
+      "lifetime_window_days": 5,
+      "max_actions_in_window": 100,
+      "confirm_ttl_s": 600
+    }
+  },
+
+  "enums": {
+    "authorize_status": ["active", "gated", "paused"],
+    "statement_mode": ["active", "paywall"],
+    "budget_class": ["paid", "trial", "flex"],
+    "acme_purpose": ["first", "renewal"],
+    "reserve_status": ["granted", "deferred"],
+    "feed_event_type": ["revoke", "pause", "resume", "license_end", "release", "kill", "kill_clear"],
+    "e2e_state": ["off", "unenrolled", "waiting", "issuing", "connecting", "ready", "degraded", "clock_skew", "compat_only", "killed"],
+    "e2e_cohort": ["paid", "trial", "flex", "legacy"],
+    "ineligible_reason": ["update_not_in_plan", "legacy_credential", "unsupported_version"],
+    "selfcheck_reason": ["chain", "expired", "spki", "name", "tls_version", "healthz", "unreachable", "timeout"]
+  }
+}

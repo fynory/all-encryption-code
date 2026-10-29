@@ -1,0 +1,44 @@
+{
+  "$comment": "Line grammar of tunnel protocol v2 (the contract section 3). A line is ASCII 0x20-0x7e, ends with LF (the LF counts toward the maximum), fields are separated by exactly one space, no field is empty. Verbs are upper case. `d2n` is device to node, `n2d` node to device. `max` names a policy key (bytes, LF included); lines without one use protocol.line_max_bytes. A field error is `bad_command` unless the field names its own `error`. `json` means the rest of the line after the verb and one space is one canonical JSON object (keys sorted, no whitespace, ASCII) validated against that schema.",
+  "version": 2,
+  "types": {
+    "version": {"pattern": "^[0-9]{1,3}$"},
+    "jwt": {"pattern": "^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$", "max_bytes_from": "protocol.jwt_max_bytes"},
+    "statement": {"pattern": "^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$"},
+    "nonce": {"pattern": "^[A-Za-z0-9_-]{22,64}$"},
+    "stream_id": {"pattern": "^[0-9a-f]{32}$"},
+    "attach_secret": {"pattern": "^[A-Za-z0-9_-]{43}$"},
+    "ip": {"format": "ip"},
+    "source_class": {"enum_from": "protocol.source_classes"},
+    "close_reason": {"enum_from": "protocol.close_reasons"},
+    "error_code": {"enum_from": "protocol.error_codes"},
+    "seconds": {"pattern": "^(?:0|[1-9][0-9]{0,5})$"}
+  },
+  "verbs": {
+    "HELLO": {"dir": "d2n", "fields": [
+      {"name": "version", "type": "version", "equals": "2", "error_if_number": "unsupported_version"},
+      {"name": "session", "type": "jwt", "error": "bad_hello"}
+    ]},
+    "PROOF": {"dir": "d2n", "fields": [{"name": "proof", "type": "jwt", "error": "bad_proof"}]},
+    "RENEW": {"dir": "d2n", "fields": [{"name": "session", "type": "jwt", "error": "bad_hello"}]},
+    "PING": {"dir": "d2n", "fields": []},
+    "HINT": {"dir": "d2n", "repeat": {"name": "address", "type": "ip", "min": 1, "max_from": "protocol.hint_max_addresses"}},
+    "CLOSE": {"dir": "both", "optional": [{"name": "reason", "type": "close_reason"}]},
+    "ATTACH": {"dir": "d2n", "channel": "data", "fields": [
+      {"name": "stream_id", "type": "stream_id", "error": "bad_attach"},
+      {"name": "secret", "type": "attach_secret", "error": "bad_attach"}
+    ]},
+    "CHALLENGE": {"dir": "n2d", "fields": [{"name": "nonce", "type": "nonce"}]},
+    "OK": {"dir": "n2d", "json": "ok-body.schema.json"},
+    "ERR": {"dir": "n2d", "fields": [{"name": "code", "type": "error_code"}]},
+    "OPEN": {"dir": "n2d", "max": "protocol.open_line_max_bytes", "fields": [
+      {"name": "stream_id", "type": "stream_id"},
+      {"name": "secret", "type": "attach_secret"},
+      {"name": "peer_ip", "type": "ip"},
+      {"name": "class", "type": "source_class"}
+    ]},
+    "PONG": {"dir": "n2d", "fields": []},
+    "STATEMENT": {"dir": "n2d", "max": "protocol.statement_line_max_bytes", "fields": [{"name": "statement", "type": "statement"}]},
+    "DRAIN": {"dir": "n2d", "fields": [{"name": "quiet_s", "type": "seconds"}]}
+  }
+}

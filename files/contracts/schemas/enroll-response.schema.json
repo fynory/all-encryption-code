@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/enroll-response.schema.json",
+  "title": "200 answer of enroll. host is stored per label (several zones can coexist); the device refuses an OK whose host differs from this one. enroll_after, when not null, is the earliest moment the device may start issuing and connecting (wave staging and certificate budget; for a computer that is not eligible it is a hold of policy.migration.ineligible_hold_s, so a device that ignores `eligible` still waits). cohort, eligible and reason (WP26, optional: a control plane older than the migration engine omits them) say which cohort the license is in, whether this computer may be moved to the encrypted path at all (Lifetime without updates and a legacy credential are never forced; a network that blocks 443 is the computer's own finding, reported as state compat_only, never a veto of the server) and, when it may not, one closed word. e2e_wave stays the global percentage (the computer is in a wave when its own bucket is below it); e2e_kill and copy_e2ee are global too.",
+  "type": "object",
+  "required": ["ok", "v", "device_id", "label", "host", "zone", "nodes", "enroll_after", "server_time", "e2e_wave", "e2e_kill", "copy_e2ee"],
+  "additionalProperties": false,
+  "properties": {
+    "ok": {"const": true},
+    "v": {"const": 1},
+    "device_id": {"$ref": "common.schema.json#/$defs/device_id"},
+    "label": {"$ref": "common.schema.json#/$defs/label"},
+    "host": {"$ref": "common.schema.json#/$defs/fqdn"},
+    "zone": {"$ref": "common.schema.json#/$defs/dns_host"},
+    "nodes": {"$ref": "common.schema.json#/$defs/nodes"},
+    "enroll_after": {"oneOf": [{"type": "null"}, {"$ref": "common.schema.json#/$defs/epoch_s"}]},
+    "server_time": {"$ref": "common.schema.json#/$defs/epoch_s"},
+    "e2e_wave": {"type": "integer", "minimum": 0, "maximum": 100},
+    "e2e_kill": {"type": "boolean"},
+    "copy_e2ee": {"type": "boolean"},
+    "cohort": {"type": "string", "enum": ["paid", "trial", "flex", "legacy"]},
+    "eligible": {"type": "boolean"},
+    "reason": {"type": "string", "enum": ["update_not_in_plan", "legacy_credential", "unsupported_version"]}
+  }
+}

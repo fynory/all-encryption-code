@@ -1,0 +1,114 @@
+{
+  "note": "TEST KEYS ONLY. Every seed is sha256('all-contracts-v1/' + name); nothing here protects anything. Ed25519 signatures are deterministic, so tokens minted from these seeds are reproducible. cp_rogue is never published; node_rogue (node-t1-0) was revoked.",
+  "salt": "",
+  "base_time": 1798761600,
+  "zone": "devices.all-e2e.test",
+  "node_zone": "nodes.all-e2e.test",
+  "control_plane": {
+    "cp": {
+      "seed_hex": "38a8bcd5a47ce37bc632b08c5c2e117ae0af6bddc05d82138ecd7245a28f6a6c",
+      "x": "fX5C9uHGorCmQCuwcraTTxZPpbxUh3elPZt5uX3OvqA",
+      "kid": "cp-2027-01"
+    },
+    "cp_old": {
+      "seed_hex": "e73ef72607d47b301ffc20f914f2f5d1cfec889956733a638f36b39ca44ec4cd",
+      "x": "sWrWvn1edtMmmO_FjDMCyue2t9Y_tf_7eFSYrI1vBr0",
+      "kid": "cp-2026-10"
+    },
+    "cp_rogue": {
+      "seed_hex": "b280a5927ce64182115f2e7a834fdcc3ff8dd4b7ea7eebc42ada800f19f1c131",
+      "x": "87rSOETX2eSX4bDGWUAR3iszXDTEvANkf3j8Z8VYoz8",
+      "kid": "cp-rogue"
+    }
+  },
+  "nodes": {
+    "node_t1": {
+      "seed_hex": "8f4a1ad60c0a8ce22a04600cd1bbffbabe85577d7bc07fe3c80338dba5d2c1e0",
+      "x": "Pur4yosK8_cuGyraj4T-gI_Zxkb1wYrL1wNJqsK-50Q",
+      "kid": "node-t1-1",
+      "node": "t1"
+    },
+    "node_t2": {
+      "seed_hex": "4b386a098e6dbd89ef018880fea627c341aa4f3b854c2afe72db6480a805bbc2",
+      "x": "l73wsYm8_aBD6pz-Aj-_tgdOcgyaZYreC9wIP-a-UcA",
+      "kid": "node-t2-1",
+      "node": "t2"
+    },
+    "node_rogue": {
+      "seed_hex": "be1178b7dceb0556709593be15c92ef1fb25c9d5b02ef777bf2f734d232ae817",
+      "x": "F3Uod5FB1Ywy-iIFhRc3s5Zgy6NUzuTJJ7UsmhnMNKI",
+      "kid": "node-t1-0",
+      "node": "t1"
+    }
+  },
+  "devices": {
+    "a": {
+      "seed_hex": "911c4d06e2daa6ff6f83f5751ef7d5ba350d83ced323d1bebf3ee38de5ffe632",
+      "x": "j72RSCHD2lGtEh2gHTZ_LFhKtTUdArwkm2VDEVAPtPA",
+      "device_id": "b290d929d06d7dd6c9a98a5b8a5276aa",
+      "label": "psrhz6n5wpzbm6yfkngo",
+      "host": "psrhz6n5wpzbm6yfkngo.devices.all-e2e.test"
+    },
+    "b": {
+      "seed_hex": "96bee129e7a2b918b542347dde37e22f0257bb26ea709c786aff7395eb112e5b",
+      "x": "7V0C8fhvAvQOcs_38WQLHcVtdbs8D1eOU6FDB8ocvAQ",
+      "device_id": "ac8fb81efc2ce011a6ded256c40a1d3a",
+      "label": "zoplfhior7zh6nwqxs6q",
+      "host": "zoplfhior7zh6nwqxs6q.devices.all-e2e.test"
+    }
+  },
+  "jwks": {
+    "cp": {
+      "keys": [
+        {
+          "kty": "OKP",
+          "crv": "Ed25519",
+          "x": "fX5C9uHGorCmQCuwcraTTxZPpbxUh3elPZt5uX3OvqA",
+          "kid": "cp-2027-01",
+          "alg": "EdDSA",
+          "use": "sig",
+          "key_ops": [
+            "verify"
+          ]
+        },
+        {
+          "kty": "OKP",
+          "crv": "Ed25519",
+          "x": "sWrWvn1edtMmmO_FjDMCyue2t9Y_tf_7eFSYrI1vBr0",
+          "kid": "cp-2026-10",
+          "alg": "EdDSA",
+          "use": "sig",
+          "key_ops": [
+            "verify"
+          ]
+        }
+      ]
+    }
+  },
+  "node_keys": {
+    "live": {
+      "keys": [
+        {
+          "kid": "node-t1-1",
+          "node": "t1",
+          "kty": "OKP",
+          "crv": "Ed25519",
+          "x": "Pur4yosK8_cuGyraj4T-gI_Zxkb1wYrL1wNJqsK-50Q"
+        },
+        {
+          "kid": "node-t2-1",
+          "node": "t2",
+          "kty": "OKP",
+          "crv": "Ed25519",
+          "x": "l73wsYm8_aBD6pz-Aj-_tgdOcgyaZYreC9wIP-a-UcA"
+        }
+      ]
+    }
+  },
+  "surface": {
+    "secret": "1E0RNbrxcukCk0rTUV8cQJ80BKH4PeJ228NtNdk9v7Q",
+    "pid": 4242,
+    "port": 45123,
+    "host": "127.0.0.1"
+  }
+}

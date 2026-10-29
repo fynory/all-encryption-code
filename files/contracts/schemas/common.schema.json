@@ -1,0 +1,208 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/common.schema.json",
+  "title": "Shared definitions of the ALL 2.0 contracts. Every pattern equals the matching key of contracts/policy.json (the contract test suite pins it).",
+  "$defs": {
+    "epoch_s": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 4102444800
+    },
+    "epoch_ms": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 8640000000000000
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "device_id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{32}$"
+    },
+    "label": {
+      "type": "string",
+      "pattern": "^[a-z2-7]{20}$"
+    },
+    "fqdn": {
+      "type": "string",
+      "maxLength": 253,
+      "pattern": "^[a-z2-7]{20}\\.(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$"
+    },
+    "dns_host": {
+      "type": "string",
+      "maxLength": 253,
+      "pattern": "^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$"
+    },
+    "acme_name": {
+      "type": "string",
+      "maxLength": 253,
+      "pattern": "^_acme-challenge\\.[a-z2-7]{20}\\.(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$"
+    },
+    "node_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]{1,16}$"
+    },
+    "stream_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{32}$"
+    },
+    "attach_secret": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{43}$"
+    },
+    "nonce": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{22,64}$"
+    },
+    "jti": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{16,128}$"
+    },
+    "kid": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-]{1,128}$"
+    },
+    "sha256_b64url": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{43}$"
+    },
+    "reservation_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{32}$"
+    },
+    "ip": {
+      "type": "string",
+      "format": "ip"
+    },
+    "reason_word": {
+      "type": "string",
+      "pattern": "^[a-z_]{1,48}$"
+    },
+    "jwt": {
+      "type": "string",
+      "maxLength": 65552,
+      "pattern": "^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$"
+    },
+    "error_code": {
+      "type": "string",
+      "enum": [
+        "bad_hello",
+        "bad_command",
+        "unsupported_version",
+        "bad_proof",
+        "auth",
+        "clock_skew",
+        "unknown_stream",
+        "bad_attach",
+        "license_inactive",
+        "device_revoked",
+        "paused",
+        "busy",
+        "control_unavailable",
+        "line_too_long"
+      ]
+    },
+    "close_reason": {
+      "type": "string",
+      "enum": [
+        "replaced",
+        "revoked",
+        "expired",
+        "released",
+        "killed",
+        "paused",
+        "drain",
+        "idle",
+        "protocol",
+        "shutdown"
+      ]
+    },
+    "source_class": {
+      "type": "string",
+      "enum": [
+        "openai",
+        "hint",
+        "anon"
+      ]
+    },
+    "authorize_status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "gated",
+        "paused"
+      ]
+    },
+    "budget_class": {
+      "type": "string",
+      "enum": [
+        "paid",
+        "trial",
+        "flex"
+      ]
+    },
+    "public_jwk": {
+      "type": "object",
+      "required": [
+        "kty",
+        "crv",
+        "x"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "kty": {
+          "const": "OKP"
+        },
+        "crv": {
+          "const": "Ed25519"
+        },
+        "x": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{43}$"
+        }
+      }
+    },
+    "node": {
+      "type": "object",
+      "required": [
+        "id",
+        "host",
+        "port"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/node_id"
+        },
+        "host": {
+          "$ref": "#/$defs/dns_host"
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "pins": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/sha256_b64url"
+          }
+        }
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "$ref": "#/$defs/node"
+      }
+    }
+  }
+}

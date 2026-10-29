@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/acme-lapsed-response.schema.json",
+  "title": "GET /v1/commerce/acme/lapsed?limit=<n>, a read key: the first issuances whose reservation ended unconfirmed after the computer had set a TXT, so that the budget keeps their slot for the whole window (an order may have been finalized and the CA may have issued a certificate nobody told the broker about). total counts all of them; entries are the ones at least policy.budget.lapsed_lift_after_s past the end of their reservation, which is the earliest a CT reconciliation may lift them (the CT logs need that long to show a certificate), oldest first, 100 at most. ended_at is when the reservation ran out.",
+  "type": "object",
+  "required": ["ok", "v", "server_time", "total", "entries"],
+  "additionalProperties": false,
+  "properties": {
+    "ok": {"const": true},
+    "v": {"const": 1},
+    "server_time": {"$ref": "common.schema.json#/$defs/epoch_s"},
+    "total": {"$ref": "common.schema.json#/$defs/count"},
+    "entries": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "required": ["label", "host", "spki_sha256", "ended_at"],
+        "additionalProperties": false,
+        "properties": {
+          "label": {"$ref": "common.schema.json#/$defs/label"},
+          "host": {"$ref": "common.schema.json#/$defs/fqdn"},
+          "spki_sha256": {"$ref": "common.schema.json#/$defs/sha256_b64url"},
+          "ended_at": {"$ref": "common.schema.json#/$defs/epoch_s"}
+        }
+      }
+    }
+  }
+}

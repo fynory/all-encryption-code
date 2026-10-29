@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/acme-reserve-request.schema.json",
+  "title": "POST /v1/devices/acme/reserve. The device sends the SHA-256 of the SubjectPublicKeyInfo of the key it just made BEFORE it opens an ACME order; the broker records it first (the registry the CT watchers compare against). purpose first counts against the class budget when confirmed; renewal never does.",
+  "type": "object",
+  "required": ["v", "spki_sha256", "purpose"],
+  "additionalProperties": false,
+  "properties": {
+    "v": {"const": 1},
+    "spki_sha256": {"$ref": "common.schema.json#/$defs/sha256_b64url"},
+    "purpose": {"type": "string", "enum": ["first", "renewal"]}
+  }
+}

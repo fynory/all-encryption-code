@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://all-mcp.fyi/contracts/v2/feed-response.schema.json",
+  "title": "GET /v1/tunnel/feed?since=<epoch>, node to control plane. Events carry a strictly increasing epoch; the answer holds every event with epoch greater than `since`, in order, each exactly once. reset=true means the node's cursor is older than the retained history: it must close every tunnel and re-authorize them.",
+  "type": "object",
+  "required": ["ok", "v", "epoch", "server_time", "events"],
+  "additionalProperties": false,
+  "properties": {
+    "ok": {"const": true},
+    "v": {"const": 1},
+    "epoch": {"$ref": "common.schema.json#/$defs/count"},
+    "server_time": {"$ref": "common.schema.json#/$defs/epoch_s"},
+    "reset": {"type": "boolean"},
+    "events": {
+      "type": "array",
+      "maxItems": 1000,
+      "items": {
+        "type": "object",
+        "required": ["epoch", "type", "device_id", "label", "at"],
+        "additionalProperties": false,
+        "properties": {
+          "epoch": {"type": "integer", "minimum": 1, "maximum": 9007199254740991},
+          "type": {"type": "string", "enum": ["revoke", "pause", "resume", "license_end", "release", "kill", "kill_clear"]},
+          "device_id": {"oneOf": [{"type": "null"}, {"$ref": "common.schema.json#/$defs/device_id"}]},
+          "label": {"oneOf": [{"type": "null"}, {"$ref": "common.schema.json#/$defs/label"}]},
+          "at": {"$ref": "common.schema.json#/$defs/epoch_s"}
+        }
+      }
+    }
+  }
+}
