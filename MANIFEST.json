@@ -385,11 +385,11 @@
       "sha256": "87b9c654892a90327033d06d1f3044e597599d48d7cda7c7ae8b9a8a41704d7d"
     },
     {
-      "bytes": 43192,
-      "lines": 839,
+      "bytes": 43696,
+      "lines": 843,
       "notice": "inspection-only",
       "path": "src/all_mcp/e2e_terminator.py",
-      "sha256": "1c155ffd6a5fb34ce06b896469d222d2105cee18adc5d0131fc685409dd09129"
+      "sha256": "fb19f101d071143ece2687ff1f201dcf8cea825bff023ef38284b8c610f84764"
     },
     {
       "bytes": 54123,
@@ -399,11 +399,11 @@
       "sha256": "d23fa82ccfe63ec04d3fd523ee69fcec78b549a40f63fc70761077cf1816847e"
     },
     {
-      "bytes": 47569,
-      "lines": 865,
+      "bytes": 47770,
+      "lines": 867,
       "notice": "inspection-only",
       "path": "src/all_mcp/surfaces.py",
-      "sha256": "edfd470d4b4b4c3903946f963ef7e5bb3df8e5d46cb3e12056633a502280369d"
+      "sha256": "d0e9bb10d5e248f680a9c6ebc83c108c8b9897fce7bbb937e422f41523d25249"
     },
     {
       "bytes": 52510,
@@ -928,12 +928,12 @@
   "license": "inspection-only",
   "notice": {
     "file": "NOTICE.md",
-    "sha256": "2221b9b48d81c4f03f61546b9a8bc466719991f9c3c66b47fc2b74a364f8c1ba"
+    "sha256": "aa9f61c01e90180938884cac2a33567ec1643ebe37188af946fe4cbdc9d671a5"
   },
   "product": "ALL",
   "publisher": "Fynory LLC",
   "schema": "all-encryption-source/1",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "withheld": [
     "tunnel/backend_loopcp.go",
     "tunnel/blindmutant_test_hook.go",

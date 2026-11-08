@@ -36,7 +36,7 @@ from dataclasses import dataclass, field
 from typing import Any, Callable
 
 from . import e2e_policy as policy
-from . import surfaces, tls_policy
+from . import loopback_seal, surfaces, tls_policy
 
 log = logging.getLogger("all_mcp.e2e_terminator")
 
@@ -569,8 +569,9 @@ class Terminator:
     def __init__(self, *, host: str, serving: Any, windows: Callable[[], Any], budgets: EndpointBudgets | None = None,
                  on_good: Callable[[str], None] | None = None, load_target: Callable[[], Any] | None = None, prove: Callable[..., Any] | None = None,
                  local_port: int | None = None, handshake_timeout: float | None = None, head_timeout: float | None = None,
-                 clock: Callable[[], float] = time.monotonic):
+                 clock: Callable[[], float] = time.monotonic, seal: bool = True):
         self.host = host
+        self._seal = seal
         self.serving = serving
         self.windows = windows
         self.budgets = budgets if budgets is not None else EndpointBudgets(clock=clock)
@@ -657,16 +658,19 @@ class Terminator:
         if target.port == self._local_surface_port():
             self.stats.no_surface += 1   # a surfaces.json that names the LOCAL port is not an E2E listener (the bootstrap bearer works there)
             return None
-        try:
-            reader, writer = await asyncio.wait_for(asyncio.open_connection(target.host, target.port, limit=1 << 16), LOCAL_DIAL_SECONDS)
-        except (OSError, asyncio.TimeoutError):
-            self.stats.agent_unreachable += 1
-            return None
-        try:
+        async def prove(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
             await self._prove(reader, writer, host=target.host, port=target.port, secret=target.secret, pid=target.pid, timeout=LOCAL_DIAL_SECONDS)
+
+        # Sealed from the first byte (loopback_seal: what ChatGPT sends never crosses loopback as readable HTTP, which antivirus suites take for an attack);
+        # in plain only when the sealed dial got no proof, i.e. an agent of the previous version during an update.
+        try:
+            reader, writer, _sealed = await loopback_seal.open_with_fallback(target.host, target.port, secret=target.secret, timeout=LOCAL_DIAL_SECONDS,
+                                                                             prove=prove, sealed_first=self._seal)
         except surfaces.SurfaceIdentityError:
             self.stats.identity_failures += 1
-            await close_writer(writer)
+            return None
+        except (OSError, asyncio.TimeoutError):
+            self.stats.agent_unreachable += 1
             return None
         return reader, writer
 

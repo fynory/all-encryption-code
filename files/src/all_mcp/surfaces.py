@@ -52,7 +52,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from . import e2e_policy as policy
-from . import state_io
+from . import loopback_seal, state_io
 from .config import runtime_values, state_dir
 
 _LOG = logging.getLogger(__name__)
@@ -580,13 +580,13 @@ def head_cap() -> int:
     return policy.value("surface.header_value_max_bytes") + policy.value("terminator.request_head_max_bytes")
 
 
-def uvicorn_config(app, *, log_level: str, concurrency: int, ws: str = "auto", lifespan: str = "auto", **options: Any):
+def uvicorn_config(app, *, log_level: str, concurrency: int, ws: str = "auto", lifespan: str = "auto", http: Any = "h11", **options: Any):
     """The settings both servers share (uvicorn is imported here so that importing this module stays cheap). `proxy_headers` is OFF and no address is trusted to
     forward: uvicorn would otherwise believe X-Forwarded-For from 127.0.0.1, which is every caller there is (the tunnel and the terminator are on loopback), and the
     rate-limit key and the client of a request would be whatever the remote caller wrote. Access logs are off (the request line carries OAuth and pairing
     parameters)."""
     import uvicorn
-    return uvicorn.Config(app, interface="asgi3", http="h11", log_level=log_level, access_log=False, proxy_headers=False, forwarded_allow_ips="", ws=ws, lifespan=lifespan,
+    return uvicorn.Config(app, interface="asgi3", http=http, log_level=log_level, access_log=False, proxy_headers=False, forwarded_allow_ips="", ws=ws, lifespan=lifespan,
                           timeout_keep_alive=policy.value("surface.keep_alive_s"), limit_concurrency=concurrency,
                           h11_max_incomplete_event_size=head_cap(), **options)
 
@@ -751,7 +751,8 @@ class SurfaceRunner:
             pid = os.getpid()
             surface = E2ESurface(self.app, host=wanted.host, secret=secret, pid=pid, port=port)
             config = uvicorn_config(surface, log_level=self.log_level, concurrency=policy.value("terminator.max_streams") * E2E_CONCURRENCY_FACTOR,
-                                    lifespan="off", ws="none", timeout_graceful_shutdown=GRACEFUL_SHUTDOWN_SECONDS)
+                                    lifespan="off", ws="none", timeout_graceful_shutdown=GRACEFUL_SHUTDOWN_SECONDS,
+                                    http=loopback_seal.sealed_h11_protocol(secret))
             server = (self._server_class or _server_class())(config)
             task = asyncio.create_task(self._guard(server, sock))
         except BaseException:
@@ -807,7 +808,8 @@ class SurfaceRunner:
             pid = os.getpid()
             surface = RelaySurface(self.app, secret=secret, pid=pid, port=port)
             config = uvicorn_config(surface, log_level=self.log_level, concurrency=policy.value("terminator.max_streams") * E2E_CONCURRENCY_FACTOR,
-                                    lifespan="off", ws="none", timeout_graceful_shutdown=GRACEFUL_SHUTDOWN_SECONDS)
+                                    lifespan="off", ws="none", timeout_graceful_shutdown=GRACEFUL_SHUTDOWN_SECONDS,
+                                    http=loopback_seal.sealed_h11_protocol(secret))
             server = (self._lane_server_class or _server_class())(config)
             task = asyncio.create_task(self._guard(server, sock))
         except BaseException:
