@@ -8,6 +8,7 @@
     "contracts/ts/verify.ts",
     "contracts/ts/package.json",
     "src/all_mcp/e2e_cert.py",
+    "src/all_mcp/win_acl.py",
     "src/all_mcp/e2e_tunnel.py",
     "src/all_mcp/e2e_terminator.py",
     "src/all_mcp/tls_policy.py",
@@ -21,7 +22,7 @@
     "tests/_pcap_builder.py",
     "tunnel/**"
   ],
-  "count": 127,
+  "count": 128,
   "denylist": [
     "tunnel/tap_test_hook.go",
     "tunnel/tap_test_hook_test.go",
@@ -357,11 +358,11 @@
       "sha256": "6244692d101b3c5851e84830e06f361eff87bac6b8716fc7d65a07d6836ccf9c"
     },
     {
-      "bytes": 84856,
-      "lines": 1530,
+      "bytes": 84180,
+      "lines": 1521,
       "notice": "inspection-only",
       "path": "src/all_mcp/e2e_cert.py",
-      "sha256": "8626594491f9433fb48af59a6045ac632bfeafaa5d6949f16ccf8c2b296e3ba9"
+      "sha256": "3e3a8e545af9a466420f9849c6209bf7992f5d685de997ffc43c3b4cec91e2c1"
     },
     {
       "bytes": 31089,
@@ -425,6 +426,13 @@
       "notice": "inspection-only",
       "path": "src/all_mcp/tray/encryption_verify.py",
       "sha256": "641d44389dd58a6c0fe58c87787efe55aec6a62a6ceed367c9f5e2a1b0ec14b2"
+    },
+    {
+      "bytes": 6849,
+      "lines": 123,
+      "notice": "inspection-only",
+      "path": "src/all_mcp/win_acl.py",
+      "sha256": "07309906b28ad6bc54b3846859910bc5e6a4291578bd0c1b682d06973286b59a"
     },
     {
       "bytes": 5373,
@@ -928,12 +936,12 @@
   "license": "inspection-only",
   "notice": {
     "file": "NOTICE.md",
-    "sha256": "aa9f61c01e90180938884cac2a33567ec1643ebe37188af946fe4cbdc9d671a5"
+    "sha256": "2add1071eeaeb2ac4b4aef8615c977237240e12d12618000e97aa722cf88f3da"
   },
   "product": "ALL",
   "publisher": "Fynory LLC",
   "schema": "all-encryption-source/1",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "withheld": [
     "tunnel/backend_loopcp.go",
     "tunnel/blindmutant_test_hook.go",

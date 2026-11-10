@@ -92,19 +92,10 @@ def _is_windows() -> bool:
 
 def _windows_owner_only(path: Path, *, directory: bool) -> None:
     """On Windows ``os.chmod`` and ``mkdir(mode=)`` restrict nothing: the folder or file would keep the ACL it inherits (Users can read it). Cut the
-    inheritance and grant only the current user and SYSTEM (the service may run as either): ``icacls /inheritance:r /grant:r``. A failure is raised:
-    a private key must not be left readable because the lock-down did not work."""
-    import subprocess
-    flags = 0x08000000   # CREATE_NO_WINDOW
-    who = subprocess.run(["whoami", "/user", "/fo", "csv", "/nh"], capture_output=True, text=True, timeout=15, creationflags=flags)
-    match = re.search(r"S-1-[0-9-]+", who.stdout or "")
-    if who.returncode != 0 or not match:
-        raise OSError("could not tell which user this is, so the key's folder was not locked to it")
-    rights = "(OI)(CI)F" if directory else "F"
-    done = subprocess.run(["icacls", str(path), "/inheritance:r", "/grant:r", f"*{match.group(0)}:{rights}", f"*S-1-5-18:{rights}"],
-                          capture_output=True, text=True, timeout=30, creationflags=flags)
-    if done.returncode != 0:
-        raise OSError(f"icacls could not lock {path.name} to its owner: {(done.stdout or done.stderr or '').strip()[:200]}")
+    inheritance and grant only the current user and SYSTEM (the service may run as either), in-process through the Win32 API (win_acl): no
+    ``icacls.exe`` is started, which antivirus products flag. A failure is raised: a private key must not be left readable because the lock-down did not work."""
+    from . import win_acl
+    win_acl.owner_only(path, directory=directory)
 
 
 def _private_dir(path: Path) -> Path:
