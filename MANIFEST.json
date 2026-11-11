@@ -50,11 +50,11 @@
       "sha256": "7c596a2d1f21a210bca7bed36cf16893686df0a55b8d84478077577e42710cc7"
     },
     {
-      "bytes": 12859,
+      "bytes": 12875,
       "lines": 376,
       "notice": "inspection-only",
       "path": "contracts/policy.json",
-      "sha256": "2b8640396d0fa3f9787670b6a821d5d03ebf74c1eeb192ced726ecc741e18ac1"
+      "sha256": "5c4b84c3879425c8d516c837d2df14da86df83081d08560a99c37d60f942238e"
     },
     {
       "bytes": 909,
@@ -936,12 +936,12 @@
   "license": "inspection-only",
   "notice": {
     "file": "NOTICE.md",
-    "sha256": "f787cd6e7ca4dea5f0a056a4fe8b582edaf1429e0fe6f1692185b56e48a136c6"
+    "sha256": "9e4ed1d1721133d8f3540943f385f3bb0c1fe1e70780b2897744fec23002ae5c"
   },
   "product": "ALL",
   "publisher": "Fynory LLC",
   "schema": "all-encryption-source/1",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "withheld": [
     "tunnel/backend_loopcp.go",
     "tunnel/blindmutant_test_hook.go",

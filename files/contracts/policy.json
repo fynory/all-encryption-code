@@ -245,7 +245,7 @@
     "per_license_per_day": 2,
     "reservation_ttl_s": 900,
     "alert_pct": 70,
-    "borrow_from": {"paid": ["flex", "trial"], "trial": ["flex"], "flex": ["trial"]},
+    "borrow_from": {"paid": ["flex", "trial"], "trial": ["flex", "paid"], "flex": ["trial", "paid"]},
     "defer_jitter_s": 7200,
     "dns_calls_per_reservation": 8,
     "reservations_per_label_per_day": 8,
