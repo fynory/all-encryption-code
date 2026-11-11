@@ -936,12 +936,12 @@
   "license": "inspection-only",
   "notice": {
     "file": "NOTICE.md",
-    "sha256": "9e4ed1d1721133d8f3540943f385f3bb0c1fe1e70780b2897744fec23002ae5c"
+    "sha256": "9be24aede1222b8d8bec6cba5280d02f96f3c62fbbf4a8740482ae5877761f9c"
   },
   "product": "ALL",
   "publisher": "Fynory LLC",
   "schema": "all-encryption-source/1",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "withheld": [
     "tunnel/backend_loopcp.go",
     "tunnel/blindmutant_test_hook.go",

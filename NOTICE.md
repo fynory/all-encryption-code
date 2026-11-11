@@ -1,4 +1,4 @@
-# ALL: código del cifrado publicado para inspección (versión 2.0.4)
+# ALL: código del cifrado publicado para inspección (versión 2.0.5)
 
 © 2026 Fynory LLC. Todos los derechos reservados.
 
@@ -12,7 +12,7 @@ Los archivos son bytes idénticos a los del programa instalado. Su SHA-256 está
 
 ---
 
-# ALL: encryption code published for inspection (version 2.0.4)
+# ALL: encryption code published for inspection (version 2.0.5)
 
 © 2026 Fynory LLC. All rights reserved.
 
